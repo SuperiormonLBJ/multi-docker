@@ -1,0 +1,24 @@
+sudo: required
+language: generic
+
+services:
+  - docker
+# build image (Dev file), build files should be under ./client folder
+before_install:
+  - docker build -t superiormon187/react-test -f ./client/Dockerfile.dev ./client
+# run test for react frontend (only)
+script:
+  - docker run -e CI=true superiormon187/react-test npm test
+# if test is suscess, then can build all the images (Prod, using Dockerfile)
+after_success:
+  - docker build -t superiormon187/multi-client ./client
+  - docker build -t superiormon187/multi-nginx ./nginx
+  - docker build -t superiormon187/multi-server ./server
+  - docker build -t superiormon187/multi-worker ./worker
+  # Log in to the docker CLI, env variables are stored in travis
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push superiormon187/multi-client
+  - docker push superiormon187/multi-nginx
+  - docker push superiormon187/multi-server
+  - docker push superiormon187/multi-worker
