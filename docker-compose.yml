@@ -1,0 +1,52 @@
+version: '3'
+services:
+  postgres:
+  # use online images for postgres
+    image: 'postgres:latest'
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+  redis:
+    image: 'redis:latest'
+  api: # server folder, avoid api cuz nginx use server as protected keyword
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./server # specify the path for dokcerfile
+    volumes:
+      - /app/node_modules # do not update/overwrite this file
+      - ./server:/app # anychange on local /server will be in Docker filesystem /app
+    environment: # these are required for server as env variables
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379 # default port for redis
+      - PGUSER=postgres # all default and can be found in offical websit
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  worker: # worker folder
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+  client: # client folder
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+    # fix websocket issue
+    environment: 
+      - WDS_SOCKET_PORT=0
+  nginx:
+    # may not same for backend since it maybe will cost lots of CPU
+    restart: always # important to keep nginx always alive since it takes rounting
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - '3333:80' # 3333 local port, 80 is port on nginx image

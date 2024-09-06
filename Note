@@ -1,0 +1,3 @@
+docker-compose up maybe will fail at first few times. 
+The reason is some worker and server containers need redis to be ready first.
+The solution is to: retyr few times. 
