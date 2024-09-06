@@ -1,0 +1,29 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions":[
+        {   
+            "name": "client", // name to dispaly in AWS
+            "image":"superiormon187/multi-client" // image name in Docker Hub, this is how integrates
+            "hostname": "client", // used to accessed by other services
+            "essential": false // if true, means once this one down/crashes, will shut down all others, 
+            // and 1 of these contianers has to be essential, nginx in this case (routing)
+        }, 
+        ,
+        {
+            "name": "nginx",
+            "image":"superiormon187/multi-nginx",
+            "hostname":"nginx",
+            "essential":true, // Nginx is essential here cuz it helps on routing
+            // same things as in docker compose, map container port to 
+            "portMapping": [
+                {
+                    "hostport": 80, // port on host machine in aws (just like our own local machine)
+                    "containerport": 80 // nginx default port on container/ in default.conf
+                }
+            ],
+            // link nginx with server and client containers, no need in docker-compose cuz it auto
+            // provides connection within all the services/conatiners inside
+            "links": ["server", "client"] // name of contianers, not hostname
+        }
+    ]
+}
