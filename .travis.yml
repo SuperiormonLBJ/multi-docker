@@ -31,10 +31,12 @@ deploy:
   env: "Multi-docker-env" # env of beanstalk 
   bucket_name: "elasticbeanstalk-ap-southeast-1-119828353856" # this is auto created with elastic beanstalk
   bucket_path: "docker-multi" # path folder to store the prod zipped files
+  on:
+    branch: master
   # this is from user with admin access to the created elastic beanstalk resource
   # can not out directly in this public file, we need to define in travis env variable instead
-  access_key_id: $AWS_ACCESS_KEY # credential to get access to the above resources
-  secret_access_key: "$AWS_SECRET_KEY"
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
 
 # Note: inside Dockerfile we need to define: "EXPOSE: 80" to indicate which port on docker should 
 # be mappeed to aws elatic beanstalk
