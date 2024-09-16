@@ -1,0 +1,37 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions":[
+        {   
+            "name": "client",
+            "image":"superiormon187/multi-client",
+            "hostname": "client",
+            "essential": false
+        },
+        {
+            "name": "server",
+            "image":"superiormon187/multi-server",
+            "hostname":"api",
+            "essential":false
+        },
+        {
+            "name": "worker",
+            "image":"superiormon187/multi-worker",
+            "hostname":"worker",
+            "essential":false
+        },
+        {
+            "name": "nginx",
+            "image":"superiormon187/multi-nginx",
+            "hostname":"nginx",
+            "essential":true,
+            "portMapping": [
+                {
+                    "hostport": 80,
+                    "containerport": 80
+                }
+            ],
+            "links": ["server", "client"]
+        }
+
+    ]
+}
